@@ -33,7 +33,6 @@ pub struct Pathfinder {
   pub options: Options
 }
 
-#[napi]
 impl Pathfinder {
   fn get_column_key(&self, x: i32, z: i32) -> String {
     format!("{},{}", x, z)
