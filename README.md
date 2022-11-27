@@ -12,6 +12,6 @@ WIP (short term):
 
 long term goals:
 - Simulated player physics engine: hitbox/block collision
-- Implementing path postprocessing for complicated movement support (jumps)
+- Implement path postprocessing for complicated movement (jump, swim, etc)
 - Advanced pathfinding goals (out of range, avoid, etc)
 ```
