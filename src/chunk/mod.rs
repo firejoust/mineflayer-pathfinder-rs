@@ -14,19 +14,22 @@ use version::{
     cliffs     // 1.18
 };
 
-trait ChunkTrait {
+const LATEST_PROTOCOL: u32 = 759;
+
+pub trait ChunkTrait {
     fn new(columns: Object, protocol_version: u32) -> Chunk;
+    fn get_block(&self, pos: &[f64; 3]) -> Option<u32>;
 }
 
 pub enum Chunk {
     Bountiful(bountiful::Chunk),
-    Combat(combat::Chunk),
-    Aquatic(aquatic::Chunk),
-    Pillage(pillage::Chunk),
-    Bees(bees::Chunk),
-    Nether(nether::Chunk),
-    Caves(caves::Chunk),
-    Cliffs(cliffs::Chunk)
+    _Combat(combat::Chunk),
+    _Aquatic(aquatic::Chunk),
+    _Pillage(pillage::Chunk),
+    _Bees(bees::Chunk),
+    _Nether(nether::Chunk),
+    _Caves(caves::Chunk),
+    _Cliffs(cliffs::Chunk)
 }
 
 impl ChunkTrait for Chunk {
@@ -40,11 +43,25 @@ impl ChunkTrait for Chunk {
             v if v <= 754 => panic!("Protocol version '{}' not supported (1.16+)", v), // 1.16
             v if v <= 756 => panic!("Protocol version '{}' not supported (1.17+)", v), // 1.17
             v if v <= 758 => panic!("Protocol version '{}' not supported (1.18+)", v), // 1.18
-            v => panic!("Protocol version '{}' not supported", v)                      // untested chunk implementation
+            v if v <= LATEST_PROTOCOL => panic!("The latest chunk protocol has not yet been implemented"), // 1.19+ (will use the next available version)
+            _ => panic!("Protocol version untested and therefore not supported")            // untested chunk implementation
+        }
+    }
+
+    fn get_block(&self, pos: &[f64; 3]) -> Option<u32> {
+        match self {
+            Chunk::Bountiful(chunk) => chunk.get_block(pos),
+            Chunk::_Combat(_) => todo!(),
+            Chunk::_Aquatic(_) => todo!(),
+            Chunk::_Pillage(_) => todo!(),
+            Chunk::_Bees(_) => todo!(),
+            Chunk::_Nether(_) => todo!(),
+            Chunk::_Caves(_) => todo!(),
+            Chunk::_Cliffs(_) => todo!(),
         }
     }
 }
 
-fn test() {
-    let chunk = Chunk::new(todo!(), 3);
+pub fn get_column_key(x: i32, z: i32) -> String {
+    format!("{},{}", x, z)
 }

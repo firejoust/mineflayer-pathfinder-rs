@@ -10,4 +10,8 @@ impl Chunk {
             columns
         }
     }
+
+    pub fn get_block(&self, pos: &[f64; 3]) -> Option<u32> {
+        todo!()
+    }
 }

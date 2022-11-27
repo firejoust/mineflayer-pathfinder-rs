@@ -6,11 +6,6 @@ use napi::bindgen_prelude::Object;
 mod chunk;
 
 #[napi(object)]
-struct BitArray {
-  pub data: Vec<u32>
-}
-
-#[napi(object)]
 pub struct Async {
   pub columns: Object
 }
