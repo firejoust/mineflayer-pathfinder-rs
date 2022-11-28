@@ -1,4 +1,5 @@
 mod version;
+mod common;
 
 use napi::bindgen_prelude::Object;
 
@@ -18,7 +19,7 @@ const LATEST_PROTOCOL: u32 = 759;
 
 pub trait ChunkTrait {
     fn new(columns: Object, protocol_version: u32) -> Chunk;
-    fn get_block(&self, pos: &[f64; 3]) -> Option<u32>;
+    fn get_block(&self, pos: [f64; 3]) -> Option<u32>;
 }
 
 pub enum Chunk {
@@ -48,7 +49,7 @@ impl ChunkTrait for Chunk {
         }
     }
 
-    fn get_block(&self, pos: &[f64; 3]) -> Option<u32> {
+    fn get_block(&self, pos: [f64; 3]) -> Option<u32> {
         match self {
             Chunk::Bountiful(chunk) => chunk.get_block(pos),
             Chunk::_Combat(_) => todo!(),
@@ -62,6 +63,17 @@ impl ChunkTrait for Chunk {
     }
 }
 
-pub fn get_column_key(x: i32, z: i32) -> String {
-    format!("{},{}", x, z)
+pub fn get_column_key(pos: [f64; 3]) -> String {
+    format!(
+        "{},{}",
+        (pos[0] as i32) >> 4,
+        (pos[2] as i32) >> 4
+    )
+}
+
+pub fn get_section_key(pos: [f64; 3], min_y: Option<f64>) -> u32 {
+    match min_y {
+        Some(y) => (pos[1] as u32 - y as u32) >> 4,
+        _ => (pos[1] as u32) >> 4
+    }
 }

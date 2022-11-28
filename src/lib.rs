@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate napi_derive;
 
+use chunk::{ChunkTrait, Chunk};
 use napi::bindgen_prelude::Object;
 
 mod chunk;
@@ -16,45 +17,32 @@ pub struct World {
   pub _async: Async
 }
 
-#[napi(object)]
-pub struct Options {
-  #[napi(js_name="protocolVersion")]
-  pub protocol_version: u32
+#[napi]
+pub struct Plugin {
+  chunk: Chunk
 }
 
-#[napi(object)]
-pub struct Pathfinder {
-  pub world: World,
-  pub options: Options
-}
-
-impl Pathfinder {
-  fn get_column_key(&self, x: i32, z: i32) -> String {
-    format!("{},{}", x, z)
+#[napi]
+impl Plugin {
+  #[napi(constructor)]
+  pub fn new(columns: Object, protocol_version: u32) -> Self {
+    Self {
+      chunk: Chunk::new(columns, protocol_version)
+    }
   }
-  
-  fn get_block(&self, pos: &[f64; 3]) {
-    let column: Object = self.world._async.columns.get(
-      self.get_column_key(
-        (pos[0] as i32) / 0x10,
-        (pos[2] as i32) / 0x10
-      )
-    )
-    .expect("Chunk hasn't loaded yet!") // this could be undefined if the chunk hasn't loaded.
-    .expect("Chunk is not a valid object!");
 
+  #[napi(js_name="getBlock")]
+  pub fn get_block(&self, x: f64, y: f64, z: f64) -> u32 {
+    self.chunk.get_block([x, y, z]).unwrap()
   }
 }
 
 #[napi]
 pub fn inject(mut bot: Object) {
-  bot.set("pathfinder", Pathfinder {
-    world: bot.get("world")
-    .expect("'world' is undefined!")
-    .expect("'world' is not a valid object!"),
-
-    options: bot.get("options")
-    .expect("'options' is undefined!")
-    .expect("'options' is not a valid object!")
-  }).unwrap() // unable to set object properties
+  let world: World = bot.get("world").unwrap().unwrap();
+  let protocol_version = bot.get("protocolVersion").unwrap().unwrap();
+  bot.set("pathfinder", Plugin::new(
+    world._async.columns,
+    protocol_version
+  )).unwrap();
 }
