@@ -5,6 +5,15 @@ use crate::chunk::{get_column_key, get_section_key};
 const DIMENSIONS_F64: [f64; 3] = [16.0, 16.0, 16.0];
 const DIMENSIONS_U32: [u32; 3] = [16, 16, 16];
 
+fn euclid(numerator: f64, denominator: f64) -> f64 {
+    let rem = numerator.abs() % denominator.abs();
+    if numerator.is_sign_negative() && rem > 0.0 {
+        denominator - rem
+    } else {
+        rem
+    }
+}
+
 #[napi(object)]
 struct Section {
     pub data: Buffer
@@ -19,9 +28,9 @@ impl Section {
 
     fn pos_in_section(&self, pos: [f64; 3]) -> [u32; 3] {
         [
-            pos[0].rem_euclid(DIMENSIONS_F64[0]) as u32,
-            pos[1].rem_euclid(DIMENSIONS_F64[1]) as u32,
-            pos[2].rem_euclid(DIMENSIONS_F64[2]) as u32
+            euclid(pos[0], DIMENSIONS_F64[0]) as u32,
+            euclid(pos[1], DIMENSIONS_F64[1]) as u32,
+            euclid(pos[2], DIMENSIONS_F64[2]) as u32,
         ]
     }
 
@@ -47,7 +56,7 @@ struct Column {
 impl Column {
     fn get_section(&self, pos: [f64; 3]) -> Option<Section> {
         self.sections.get(
-            get_section_key(pos, None)
+            get_section_key(pos, None)?
         ).expect("Expected chunk section; got something else?")?
     }
 }

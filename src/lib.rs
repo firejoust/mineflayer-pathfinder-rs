@@ -33,7 +33,10 @@ impl Plugin {
 
   #[napi(js_name="getBlock")]
   pub fn get_block(&self, x: f64, y: f64, z: f64) -> u32 {
-    self.chunk.get_block([x, y, z]).unwrap()
+    match self.chunk.get_block([x, y, z]) {
+      Some(v) => v,
+      None => 0
+    }
   }
 }
 

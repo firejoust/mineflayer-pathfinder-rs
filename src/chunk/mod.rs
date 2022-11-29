@@ -71,9 +71,9 @@ pub fn get_column_key(pos: [f64; 3]) -> String {
     )
 }
 
-pub fn get_section_key(pos: [f64; 3], min_y: Option<f64>) -> u32 {
+pub fn get_section_key(pos: [f64; 3], min_y: Option<f64>) -> Option<u32> {
     match min_y {
-        Some(y) => (pos[1] as u32 - y as u32) >> 4,
-        _ => (pos[1] as u32) >> 4
+        Some(y) => u32::try_from((pos[1] - y) as i32 >> 4).ok(),
+        None => u32::try_from((pos[1] as i32) >> 4).ok()
     }
 }
