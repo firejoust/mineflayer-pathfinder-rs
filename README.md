@@ -1,5 +1,7 @@
 ## Mineflayer Pathfinder (Rust Implementation)
-Get your minecraft bot from point A to B
+Get your minecraft bot from point A to B.
+
+Currently a work in progress and may never be finished!!!
 
 ```
 WIP (short term):
